@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\OrderItem;
 
 
@@ -36,20 +37,21 @@ class OrderController extends Controller
         ]);
 
         foreach ($request->input('order_items') as $item) {
-            $product = $item['product_id'];
-            $quantity = $item['quantity'];
+            $product = Product::find($item['product_id']);
 
-            $subtotal = $product->price * $quantity;
+            if ($product) {
+                $quantity = $item['quantity'];
+                $subtotal = $product->price * $quantity;
 
-            $orderItem = new OrderItem([
-                'product_id' => $product->id,
-                'quantity' => $quantity,
-                'subtotal' => $subtotal,
-            ]);
+                $orderItem = new OrderItem([
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'subtotal' => $subtotal,
+                ]);
 
-            $order->orderItems()->save($orderItem);
+                $order->orderItems()->save($orderItem);
+            }
         }
-
         return response()->json(['message' => 'Order placed successfully'], 201);
     }
 }

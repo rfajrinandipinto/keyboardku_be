@@ -46,6 +46,9 @@ class ProductController extends Controller
                 break;
         }
 
+        $query->where('status', '=', 'active');
+        $query->where('stock', '>', 0);
+
         $limit = $request->input('limit', 99);
         $products = $query->take($limit)->get();
 
